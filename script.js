@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     let usercount = 0;
+    const userNames = [];
 
     const elements = {
         firstNameInput: document.getElementById("firstNameInput"),
@@ -11,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
     function generateUserName(firstName, lastName){
         let firstPart = "";
         let secondPart = "";
+        let userName = "";
+        let sameNameCount = 1;
+        let sameNameUserName = "";
 
         if(firstName.length > 2){
             firstPart = firstName[0] + (firstName.length - 2) + firstName[firstName.length - 1];
@@ -28,13 +32,22 @@ document.addEventListener("DOMContentLoaded", () => {
             return null;
         }
 
-        return firstPart + secondPart;
+        userName = firstPart + secondPart;
+        sameNameUserName = userName;
+
+        while(userNames.indexOf(userName) > -1){
+            sameNameCount++;
+            userName = sameNameUserName + sameNameCount;
+        };
+
+        userNames.push(userName);
+        return userName;
     }
 
     function addTableData(firstName, lastName, userName){
         const newTableRow = document.createElement("tr");
 
-        for(let i = 0; i < 5; i++){
+        for(let i = 0; i < 6; i++){
             newTableRow.appendChild(document.createElement("td"));
         }
 
@@ -42,12 +55,19 @@ document.addEventListener("DOMContentLoaded", () => {
         newTableRow.children[1].innerText = firstName;
         newTableRow.children[2].innerText = lastName;
         newTableRow.children[3].innerText = userName;
-        newTableRow.children[4].innerText = new Date().toISOString();
+        newTableRow.children[4].innerText = generateEmailAddress(userName);
+        newTableRow.children[5].innerText = new Date().toISOString();
 
         elements.userTable.appendChild(newTableRow);
     }
 
-    elements.submitButton.addEventListener("click", () => {
+    function generateEmailAddress(userName){
+        return userName + "@mail-provider.de";
+    }
+
+    elements.submitButton.addEventListener("click", (event) => {
+        event.preventDefault();
+
         const firstName = elements.firstNameInput.value.trim().toLowerCase();
         const lastName = elements.lastNameInput.value.trim().toLowerCase();
 
