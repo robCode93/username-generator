@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let encodedUri = encodeURI(csvContent);
         let link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "usernames_data.csv");
+        link.setAttribute("download", "usernames-data.csv");
 
         // Füge das a-Tag zum Dokument hinzu und klicke darauf um den Download zu starten
         document.body.appendChild(link);
