@@ -1,12 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
     let usercount = 0;
     const userNames = [];
+    const csvRows = [
+        ["ID", "Firstname", "Lastname", "Username", "Email-Address", "TimeStamp"],
+    ];
 
     const elements = {
         firstNameInput: document.getElementById("firstNameInput"),
         lastNameInput: document.getElementById("lastNameInput"),
+        domainInput: document.getElementById("domain"),
         submitButton: document.getElementById("submitButton"),
         userTable: document.getElementById("userTable"),
+        generateListButton: document.getElementById("generateListButton")
     }
 
     function generateUserName(firstName, lastName){
@@ -47,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function addTableData(firstName, lastName, userName){
         const newTableRow = document.createElement("tr");
 
-        for(let i = 0; i < 6; i++){
+        for(let i = 0; i < 7; i++){
             newTableRow.appendChild(document.createElement("td"));
         }
 
@@ -58,21 +63,79 @@ document.addEventListener("DOMContentLoaded", () => {
         newTableRow.children[4].innerText = generateEmailAddress(userName);
         newTableRow.children[5].innerText = new Date().toISOString();
 
+        const deleteButton = generateDeleteButton();
+        newTableRow.children[6].appendChild(deleteButton);
+
         elements.userTable.appendChild(newTableRow);
+
+        addCsvLine(elements.userTable.children.length, firstName, lastName, userName, newTableRow.children[4].innerText, newTableRow.children[5].innerText);
     }
 
     function generateEmailAddress(userName){
-        return userName + "@mail-provider.de";
+        if(elements.domainInput.value.length < 1){
+            return userName + "@mail-provider.de";
+        }else{
+            return userName + "@" + elements.domainInput.value;
+        }
     }
 
+    function generateDeleteButton(){
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("btn");
+        deleteButton.classList.add("btn-danger");
+        deleteButton.classList.add("deleteButton");
+        deleteButton.innerText = "Löschen";
+
+        return deleteButton;
+    }
+
+    function removeTableRow(event){
+        const tableRow = event.target.closest("tr");
+        tableRow.remove();
+    }
+
+    function addCsvLine(index, firstName, lastName, userName, mailAddress, timeStamp){
+        csvRows.push([index, firstName, lastName, userName, mailAddress, timeStamp]);
+    }
+
+    function createCsvFile(){
+        let csvContent = "data:text/csv;charset=utf-8,";
+
+        csvRows.forEach(function(row) {
+            csvContent += row.join(",") + "\n";
+        });
+
+        // Erstelle ein temporäres a-Tag und setze die CSV als den href-Link
+        let encodedUri = encodeURI(csvContent);
+        let link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "usernames_data.csv");
+
+        // Füge das a-Tag zum Dokument hinzu und klicke darauf um den Download zu starten
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    
     elements.submitButton.addEventListener("click", (event) => {
         event.preventDefault();
-
+    
         const firstName = elements.firstNameInput.value.trim().toLowerCase();
         const lastName = elements.lastNameInput.value.trim().toLowerCase();
-
+    
         const userName = generateUserName(firstName, lastName);
         addTableData(firstName, lastName, userName);
+
         usercount++;
+    
+        const deleteButtons = document.querySelectorAll(".deleteButton");
+        deleteButtons.forEach(deleteButton => {
+            deleteButton.addEventListener("click", removeTableRow);
+        });
+    });
+
+    elements.generateListButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        createCsvFile();
     })
 })

@@ -22,8 +22,13 @@
                 <label for="lastName" class="form-label">Lastname</label>
                 <input type="text" class="form-control" id="lastNameInput">
             </div> 
-            <button class="btn btn-primary" id="submitButton">Erzeuge Username</button>
-          </form>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">@</span>
+                <input type="text" class="form-control" placeholder="domain.com" aria-label="domain" aria-describedby="basic-addon1" id="domain">
+              </div>
+            <button class="btn btn-primary" id="submitButton">Create Username</button>
+            <button class="btn btn-secondary" id="generateListButton">Create List</button>
+        </form>
 
           <table class="table mt-5">
             <thead>
@@ -34,6 +39,7 @@
                     <th scope="col">Username</th>
                     <th scope="col">E-Mail-Address</th>
                     <th scope="col">Timestamp</th>
+                    <th scope="col">Delete</th>
                 </tr>
             </thead>
             <tbody id="userTable">
