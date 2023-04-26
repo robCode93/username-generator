@@ -9,9 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
         firstNameInput: document.getElementById("firstNameInput"),
         lastNameInput: document.getElementById("lastNameInput"),
         domainInput: document.getElementById("domain"),
+        sqlInput: document.getElementById("sql"),
         submitButton: document.getElementById("submitButton"),
         userTable: document.getElementById("userTable"),
-        generateListButton: document.getElementById("generateListButton")
+        generateListButton: document.getElementById("generateListButton"),
+        generateSqlButton: document.getElementById("generateSqlButton")
     }
 
     function generateUserName(firstName, lastName){
@@ -116,6 +118,36 @@ document.addEventListener("DOMContentLoaded", () => {
         link.click();
         document.body.removeChild(link);
     }
+
+    function createSqlScript(){
+        let tableName = "";
+        let sqlQueryString = "CREATE TABLE";
+        let idCount = 0;
+
+        if(elements.sqlInput.length < 1 || elements.sqlInput.value === null){
+            tableName = "maytable";
+            sqlQueryString += " " + tableName + " (id INT PRIMARY KEY, firstname VARCHAR(50), lastname VARCHAR(50), username VARCHAR(50), mail VARCHAR(50), timestamp VARCHAR(50));\n";
+        }else{
+            tableName = elements.sqlInput.value;
+            sqlQueryString +=  " " + tableName + " (id INT PRIMARY KEY, firstname VARCHAR(50), lastname VARCHAR(50), username VARCHAR(50), mail VARCHAR(50), timestamp VARCHAR(50));\n";
+        }
+
+        for(const row of elements.userTable.children){
+            idCount++;
+
+            sqlQueryString += "INSERT INTO " + tableName + " (id, firstname, lastname, username, mail, timestamp) VALUES ";
+            sqlQueryString += "(" + idCount + ", '" + row.children[1].innerText + "', '" + row.children[2].innerText + "', '" + row.children[3].innerText + "', '" + row.children[4].innerText + "', '" + row.children[5].innerText + "');\n";
+        }
+
+        const encodedSqlQueryString = encodeURIComponent(sqlQueryString);
+        const link = document.createElement("a");
+        link.setAttribute("href", "data:text/plain;charset=utf-8," + encodedSqlQueryString);
+        link.setAttribute("download", "username-data.sql");
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }   
     
     elements.submitButton.addEventListener("click", (event) => {
         event.preventDefault();
@@ -125,6 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
         const userName = generateUserName(firstName, lastName);
         addTableData(firstName, lastName, userName);
+
+        elements.firstNameInput.value = "";
+        elements.lastNameInput.value = "";
 
         usercount++;
     
@@ -137,5 +172,10 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.generateListButton.addEventListener("click", (event) => {
         event.preventDefault();
         createCsvFile();
+    })
+
+    elements.generateSqlButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        createSqlScript();
     })
 })
